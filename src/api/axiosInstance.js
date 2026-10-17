@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   // შეცვალე შენი ბექენდის რეალური პორტით და მისამართით
-  baseURL: 'https://trading-journal-umber-nine.vercel.app/', 
+  baseURL: 'https://trading-journal-umber-nine.vercel.ap', 
 });
 
 // ეს ინტერსეპტორი ყოველ მოთხოვნაში ჩასვამს LocalStorage-დან აღებულ ტოკენს
