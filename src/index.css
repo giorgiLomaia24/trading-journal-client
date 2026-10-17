@@ -1,0 +1,20 @@
+
+@import "tailwindcss";
+
+@theme {
+  /* ჩვენი ძირითადი მუქი პალიტრა */
+   --color-dark-bg: #0B0E11;
+  --color-dark-surface: #181A20;
+  --color-dark-border: #2B2F36;
+  --color-dark-text: #EAECEF;
+  --color-dark-muted: #848E9C;
+
+  /* ჩვენი დომინანტი მწვანე აქცენტები */
+  --color-brand-green: #0ECB81;
+  --color-brand-green-hover: #0B9B62;
+  --color-brand-green-dim: rgba(14, 203, 129, 0.1);
+
+  /* დამხმარე წითელი (ზარალის საჩვენებლად) */
+  --color-brand-red: #F6465D;
+  --color-brand-red-dim: rgba(246, 70, 93, 0.1);
+}
