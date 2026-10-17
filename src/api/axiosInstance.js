@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
   // შეცვალე შენი ბექენდის რეალური პორტით და მისამართით
-  baseURL: 'http://localhost:5000/api', 
+  baseURL: 'https://trading-journal-pmzr-q14d6t60s-giorgis-projects-242655bb.vercel.app/api', 
 });
 
 // ეს ინტერსეპტორი ყოველ მოთხოვნაში ჩასვამს LocalStorage-დან აღებულ ტოკენს
