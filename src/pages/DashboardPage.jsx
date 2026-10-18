@@ -96,6 +96,13 @@ useEffect(() => {
     );
   }
 
+  const anchorLabel = kpiData.anchorDate
+  ? new Date(kpiData.anchorDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+  : "";
+const headerDescription = kpiData.isBacktest
+  ? `Backtest account • as of ${anchorLabel}`
+  : new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+
   const totalPnLValue = Number(kpiData.totalPnL?.value) || 0;
 
   return (
@@ -248,7 +255,11 @@ useEffect(() => {
           </div>
 
           <div className="lg:col-span-1">
-            <ActivityHeatmap data={heatmapData?.heatmapData || []} />
+            {/* <ActivityHeatmap data={heatmapData?.heatmapData || []} /> */}
+            <ActivityHeatmap
+  data={heatmapData?.heatmapData || []}
+  anchorDate={kpiData.isBacktest ? heatmapData?.range?.end : undefined}
+/>
           </div>
         </div>
       </div>

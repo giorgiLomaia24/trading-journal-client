@@ -9,11 +9,17 @@ const pad = (n) => String(n).padStart(2, "0");
 const toKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const fmtMoney = (n) => `${n >= 0 ? "+" : "-"}$${Math.abs(n).toFixed(2)}`;
 
-export default function ActivityHeatmap({ data = [] }) {
+export default function ActivityHeatmap({ data = [], anchorDate }) {
   // ბადეც და ქვედა ციფრებიც ერთი და იმავე უჯრებიდან ითვლება, ამიტომ ერთმანეთს ვერ დაუპირისპირდება
   const { cells, stats } = useMemo(() => {
     const byDate = new Map(data.map((item) => [item.date, item]));
-    const now = new Date();
+    const now = (() => {
+  if (typeof anchorDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(anchorDate)) {
+    const [y, m, d] = anchorDate.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date();
+})();
     const todayKey = toKey(now);
 
     // ბადე იწყება კვირას, 3 სრული კვირით უკან (SUN-SAT სვეტებთან დასაზუსტებლად)
@@ -60,7 +66,7 @@ export default function ActivityHeatmap({ data = [] }) {
         breakevenDays: active.filter((c) => c.status === "Breakeven").length
       }
     };
-  }, [data]);
+  }, [data, anchorDate]);
 
   const getSquareClass = (c) => {
     if (c.isFuture) return "border border-dashed border-[#1f2023]/60 opacity-40 cursor-default";

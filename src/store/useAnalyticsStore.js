@@ -5,8 +5,6 @@ import { create } from 'zustand';
 import axiosInstance from '../api/axiosInstance';
 import axios from 'axios';
 
-
-
 // Race Condition-ის დაცვა: აქტიური მოთხოვნის კონტროლერი + უახლესი მოთხოვნის ID
 let currentAbortController = null;
 let latestRequestId = 0;
@@ -36,31 +34,21 @@ export const useAnalyticsStore = create((set) => ({
     }
   },
 
-  // fetchPerformanceChartData: async (accountId = "") => {
-  //   set({ loading: true, error: null });
-  //   try {
-  //     const res = await axiosInstance.get('/analytics/performance-chart', { params: { account: accountId } });
-  //     set({ performanceChartData: res.data, loading: false });
-  //   } catch (err) {
-  //     set({ error: err.response?.data?.message || 'გრაფიკის მონაცემები ვერ მოიძებნა', loading: false });
-  //   }
-  // },
-
   fetchPerformanceChartData: async (accountId = "", range = "") => {
-  const requestId = ++latestChartRequestId;
-  set({ loading: true, error: null });
-  try {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const res = await axiosInstance.get('/analytics/performance-chart', {
-      params: { account: accountId, range, tz }
-    });
-    if (requestId !== latestChartRequestId) return; // უფრო ახალი მოთხოვნა დაიწყო
-    set({ performanceChartData: res.data, loading: false });
-  } catch (err) {
-    if (requestId !== latestChartRequestId) return;
-    set({ error: err.response?.data?.message || 'გრაფიკის მონაცემები ვერ მოიძებნა', loading: false });
-  }
-},
+    const requestId = ++latestChartRequestId;
+    set({ loading: true, error: null });
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const res = await axiosInstance.get('/analytics/performance-chart', {
+        params: { account: accountId, range, tz }
+      });
+      if (requestId !== latestChartRequestId) return; // უფრო ახალი მოთხოვნა დაიწყო
+      set({ performanceChartData: res.data, loading: false });
+    } catch (err) {
+      if (requestId !== latestChartRequestId) return;
+      set({ error: err.response?.data?.message || 'გრაფიკის მონაცემები ვერ მოიძებნა', loading: false });
+    }
+  },
 
   fetchPerformanceScoreData: async (accountId = "") => {
     set({ loading: true, error: null });
@@ -72,17 +60,19 @@ export const useAnalyticsStore = create((set) => ({
     }
   },
 
+  // Heatmap: tz-ს ვუგზავნით, რომ დღეები ბრაუზერის დროის ზონით დაჯგუფდეს (ბადესთან ერთნაირად)
   fetchTradingActivityHeatmap: async (accountId = "") => {
     set({ loading: true, error: null });
     try {
-      const res = await axiosInstance.get('/analytics/heatmap', { params: { account: accountId } });
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const res = await axiosInstance.get('/analytics/heatmap', { params: { account: accountId, tz } });
       set({ heatmapData: res.data, loading: false });
     } catch (err) {
       set({ error: err.response?.data?.message || 'Heatmap-ის წამოღება ვერ მოხერხდა', loading: false });
     }
   },
 
-  // 🚀 Race-safe სტატისტიკა
+  // Race-safe სტატისტიკა
   fetchAdvancedStatistics: async (filters = {}) => {
     // წინა აქტიური მოთხოვნის გაუქმება
     if (currentAbortController) currentAbortController.abort();

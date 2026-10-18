@@ -30,6 +30,10 @@ const pad = (n) => String(n).padStart(2, "0");
 // ლოკალური თარიღი YYYY-MM-DD (UTC გარეშე, რომ დღე არ გადაიწიოს)
 const toLocalDateStr = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const toLocalTimeStr = (d) => `${pad(d.getHours())}${pad(d.getMinutes())}`;
+const defaultDateFor = (acc) =>
+  acc?.accountType === "Backtest" && acc.anchorDate
+    ? toLocalDateStr(new Date(acc.anchorDate))
+    : toLocalDateStr(new Date());
 
 const mapRules = (rules = [], checkedIds = []) =>
   rules.map((r) => ({ id: r.ruleId, text: r.text, checked: checkedIds.includes(r.ruleId) }));
@@ -77,6 +81,7 @@ export default function AddTradeModal({ isOpen, onClose, onSave, tradeToEdit = n
   const [selectedEmotions, setSelectedEmotions] = useState([]);
   const [tags, setTags] = useState([]);
   const [tagInput, setTagInput] = useState("");
+  const dateTouched = useRef(false);
 
   // ქვემოდალები (Add Strategy / Add Account)
   const [showStrategyModal, setShowStrategyModal] = useState(false);
@@ -98,6 +103,16 @@ export default function AddTradeModal({ isOpen, onClose, onSave, tradeToEdit = n
     }
     return () => { document.body.style.overflow = "unset"; };
   }, [isOpen, fetchAccounts, fetchStrategies, fetchSessions]);
+
+  useEffect(() => {
+  if (isOpen) dateTouched.current = false;
+  }, [isOpen, tradeToEdit]);
+  
+  useEffect(() => {
+  if (!isOpen || tradeToEdit || dateTouched.current) return;
+  const acc = accounts.find((a) => a._id === account);
+  if (acc) setTradeDate(defaultDateFor(acc));
+}, [isOpen, tradeToEdit, account, accounts]);
 
   // ---------- 2) ფორმის შევსება/გასუფთავება მხოლოდ გახსნისას ან სხვა ტრეიდზე გადასვლისას ----------
   useEffect(() => {
@@ -492,7 +507,9 @@ export default function AddTradeModal({ isOpen, onClose, onSave, tradeToEdit = n
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <InputField label="Trade Date" type="date" value={tradeDate} onChange={setTradeDate} />
+              {/* <InputField label="Trade Date" type="date" value={tradeDate} onChange={setTradeDate} /> */}
+                            <InputField label="Trade Date" type="date" value={tradeDate} onChange={(v) => { dateTouched.current = true; setTradeDate(v); }} />
+
               <InputField label="Entry Time" type="time" placeholder="0930" value={entryTime} onChange={setEntryTime} hint="Just type numbers (e.g., 0930)" />
               <InputField label="Exit Time" type="time" placeholder="1600" value={exitTime} onChange={setExitTime} hint="Just type numbers (e.g., 1600)" />
             </div>
